@@ -38,6 +38,7 @@ const Tetris: React.FC = () => {
   }>>([])
   const [showModal, setShowModal] = useState(false)
   const [clearedLines, setClearedLines] = useState<number[]>([])
+  const [gameStarted, setGameStarted] = useState(false)
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -121,20 +122,27 @@ const Tetris: React.FC = () => {
       newBoard = clearLines(newBoard)
       setBoard(newBoard)
       
-      // 게임 오버 체크 추가
+      // 게임 오버 체크
       if (currentPiece.y <= 0) {
         setGameOver(true)
         setShowModal(true)
+        setGameStarted(false)
         return
       }
       
+      // 다음 피스로 현재 피스 설정
       setCurrentPiece({
         ...nextPieces[0],
         x: Math.floor(BOARD_WIDTH / 2) - Math.floor(nextPieces[0].shape[0].length / 2),
         y: 0
       })
+      
+      // 다음 피스 배열 업데이트
       setNextPieces(prev => {
-        const newNextPieces = [...prev.slice(1), createNewPiece()]
+        const newNextPieces = [...prev.slice(1)]
+        while (newNextPieces.length < 3) {
+          newNextPieces.push(createNewPiece())
+        }
         return newNextPieces
       })
     } else {
@@ -172,8 +180,23 @@ const Tetris: React.FC = () => {
     let newBoard = mergePieceToBoard(newPiece, board)
     newBoard = clearLines(newBoard)
     setBoard(newBoard)
-    setCurrentPiece(createNewPiece())
-  }, [currentPiece, board, isCollision, mergePieceToBoard, clearLines, createNewPiece, gameOver])
+    
+    // 다음 피스로 현재 피스 설정
+    setCurrentPiece({
+      ...nextPieces[0],
+      x: Math.floor(BOARD_WIDTH / 2) - Math.floor(nextPieces[0].shape[0].length / 2),
+      y: 0
+    })
+    
+    // 다음 피스 배열 업데이트
+    setNextPieces(prev => {
+      const newNextPieces = [...prev.slice(1)]
+      while (newNextPieces.length < 3) {
+        newNextPieces.push(createNewPiece())
+      }
+      return newNextPieces
+    })
+  }, [currentPiece, board, nextPieces, isCollision, mergePieceToBoard, clearLines, createNewPiece, gameOver])
 
   const createEmptyBoard = (): TetrisBoard => {
     return Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(null))
@@ -188,6 +211,26 @@ const Tetris: React.FC = () => {
     setGameOver(false)
     setShowModal(false)
     // 게임 시작 로직을 여기에 추가
+  }
+
+  const startGame = () => {
+    setGameStarted(true)
+    resetGame()
+    const initialNextPieces = [
+      createNewPiece(),
+      createNewPiece(),
+      createNewPiece()
+    ]
+    setNextPieces(initialNextPieces)
+    setCurrentPiece({
+      ...createNewPiece(),
+      x: Math.floor(BOARD_WIDTH / 2) - 1,
+      y: 0
+    })
+  }
+
+  const exitGame = () => {
+    window.location.href = '/' // 메인 화면의 경로로 설정
   }
 
   useEffect(() => {
@@ -218,33 +261,87 @@ const Tetris: React.FC = () => {
   }, [moveHorizontally, moveDown, rotate, dropPiece])
 
   useEffect(() => {
-    if (!currentPiece && !gameOver) {
-      const newPiece = createNewPiece()
-      const newNextPieces = [createNewPiece(), createNewPiece(), createNewPiece()]
-      if (isCollision({...newPiece, y: 0}, board)) {
-        setGameOver(true)
-        setShowModal(true)
+    if (!currentPiece && !gameOver && gameStarted) {
+      if (nextPieces.length === 0) {
+        // 초기 상태일 경우 새로운 피스들 생성
+        const initialNextPieces = [
+          createNewPiece(),
+          createNewPiece(),
+          createNewPiece()
+        ]
+        setNextPieces(initialNextPieces)
+        setCurrentPiece({
+          ...createNewPiece(),
+          x: Math.floor(BOARD_WIDTH / 2) - 1,
+          y: 0
+        })
       } else {
-        setCurrentPiece(newPiece)
-        setNextPieces(newNextPieces)
+        // 다음 피스로 현재 피스 설정
+        setCurrentPiece({
+          ...nextPieces[0],
+          x: Math.floor(BOARD_WIDTH / 2) - Math.floor(nextPieces[0].shape[0].length / 2),
+          y: 0
+        })
+        // 다음 피스 배열 업데이트
+        setNextPieces(prev => {
+          const newNextPieces = [...prev.slice(1)]
+          while (newNextPieces.length < 3) {
+            newNextPieces.push(createNewPiece())
+          }
+          return newNextPieces
+        })
       }
     }
-  }, [currentPiece, createNewPiece, isCollision, board, gameOver])
+  }, [currentPiece, createNewPiece, isCollision, board, gameOver, gameStarted, nextPieces])
 
   useEffect(() => {
+    if (!gameStarted || gameOver) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+      return
+    }
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
     }
-    const speed = Math.max(100, 1000 - (level - 1) * 100) // 최소 속도는 100ms
+    const speed = Math.max(100, 1000 - (level - 1) * 100) // 최고 속도는 100ms
     intervalRef.current = setInterval(moveDown, speed)
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
     }
-  }, [moveDown, level])
+  }, [moveDown, level, gameStarted, gameOver])
+
+  // useEffect 추가
+  useEffect(() => {
+    const handleStartGameKeyPress = (event: KeyboardEvent) => {
+      if (!gameStarted && event.key === 'Enter') {
+        startGame();
+      }
+    };
+
+    window.addEventListener('keydown', handleStartGameKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleStartGameKeyPress);
+    };
+  }, [gameStarted]);
 
   const renderBoard = () => {
+    if (!gameStarted) {
+      return Array(BOARD_HEIGHT).fill(null).map((_, i) => (
+        <div key={i} className="flex">
+          {Array(BOARD_WIDTH).fill(null).map((_, j) => (
+            <div
+              key={`${i}-${j}`}
+              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gray-900 border border-gray-700"
+            />
+          ))}
+        </div>
+      ))
+    }
+
     const boardWithPiece = currentPiece
       ? mergePieceToBoard(currentPiece, board)
       : board
@@ -278,32 +375,57 @@ const Tetris: React.FC = () => {
   }
 
   const renderNextPieces = () => {
-    const previewWidth = 4; // 미리보기 너비를 4로 고정
-    const previewHeight = 2; // 미리보기 높이를 2로 고정
+    // 게임이 시작되지 않았을 때 빈 미리보기 블록 생성
+    if (!gameStarted) {
+      return Array(3).fill(null).map((_, index) => {
+        const previewSize = 4;
+        return (
+          <div key={index} className="mb-2 sm:mb-3 md:mb-4 border-2 border-gray-300 p-1 sm:p-2 bg-gray-900">
+            {Array.from({ length: previewSize }).map((_, row) => (
+              <div key={row} className="flex">
+                {Array.from({ length: previewSize }).map((_, col) => (
+                  <div
+                    key={`next-${index}-${row}-${col}`}
+                    className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 border border-gray-700 bg-gray-900"
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        );
+      });
+    }
 
+    // 게임 중일 때의 미리보기 블록
     return nextPieces.map((piece, index) => {
       const pieceHeight = piece.shape.length;
-      const pieceWidth = Math.max(...piece.shape.map(row => row.length));
-      const horizontalPadding = Math.max(0, previewWidth - pieceWidth);
-      const verticalPadding = Math.max(0, previewHeight - pieceHeight);
+      const pieceWidth = piece.shape[0].length;
+      const previewSize = 4;
+      const offsetY = Math.floor((previewSize - pieceHeight) / 2);
+      const offsetX = Math.floor((previewSize - pieceWidth) / 2);
 
       return (
-        <div key={index} className="mb-2 sm:mb-3 md:mb-4 border-2 border-gray-300 p-1 sm:p-2 bg-white">
-          {Array.from({ length: previewHeight }).map((_, row) => (
+        <div key={index} className="mb-2 sm:mb-3 md:mb-4 border-2 border-gray-300 p-1 sm:p-2 bg-gray-900">
+          {Array.from({ length: previewSize }).map((_, row) => (
             <div key={row} className="flex">
-              {Array.from({ length: previewWidth }).map((_, col) => {
-                const pieceRow = row - Math.floor(verticalPadding / 2);
-                const pieceCol = col - Math.floor(horizontalPadding / 2);
+              {Array.from({ length: previewSize }).map((_, col) => {
+                const pieceRow = row - offsetY;
+                const pieceCol = col - offsetX;
                 const isActive = 
-                  pieceRow >= 0 && pieceRow < pieceHeight &&
-                  pieceCol >= 0 && pieceCol < pieceWidth &&
+                  pieceRow >= 0 && 
+                  pieceRow < pieceHeight && 
+                  pieceCol >= 0 && 
+                  pieceCol < pieceWidth && 
                   piece.shape[pieceRow][pieceCol];
+                
                 return (
                   <div
                     key={`next-${index}-${row}-${col}`}
-                    className={`w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 border border-gray-300 ${
-                      isActive ? piece.color : 'bg-white'
-                    }`}
+                    className={`
+                      w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 
+                      border border-gray-700 
+                      ${isActive ? piece.color : 'bg-gray-900'}
+                    `}
                   />
                 );
               })}
@@ -320,16 +442,31 @@ const Tetris: React.FC = () => {
         <div className="mb-6 md:mb-0 md:mr-6 lg:mr-8 xl:mr-12">
           <div className="text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-4 md:mb-6 text-white">Score: {score}</div>
           <div className="text-lg sm:text-xl md:text-2xl mb-2 sm:mb-4 md:mb-6 text-white">Level: {level}</div>
-          <div className="border-4 border-gray-700">
+          <div className="border-4 border-gray-700 relative">
             {renderBoard()}
+            {!gameStarted && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <button
+                  onClick={startGame}
+                  className="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-full shadow-lg transform transition-transform duration-200 hover:scale-105"
+                >
+                  게임 시작 (Enter)
+                </button>
+              </div>
+            )}
           </div>
-          {gameOver && (
-            <div className="text-xl sm:text-2xl md:text-3xl mt-2 sm:mt-4 md:mt-6 text-white">Game Over!</div>
-          )}
         </div>
         <div className="bg-gray-700 p-3 sm:p-4 md:p-5 lg:p-6 rounded-lg">
           {renderNextPieces()}
         </div>
+      </div>
+      <div className="flex justify-center p-4 space-x-4">
+        <button
+          onClick={exitGame}
+          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full shadow-lg transform transition-transform duration-200 hover:scale-105"
+        >
+          나가기
+        </button>
       </div>
       {showModal && (
         <WarmAlert

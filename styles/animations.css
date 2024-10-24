@@ -1,0 +1,26 @@
+@keyframes shatter {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(0.9) rotate(-5deg);
+    opacity: 0.6;
+  }
+  75% {
+    transform: scale(1.2) rotate(10deg);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+}
+
+.animate-shatter {
+  animation: shatter 0.4s ease-in-out forwards;
+}
