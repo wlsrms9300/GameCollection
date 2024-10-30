@@ -44,6 +44,10 @@ const Tetris: React.FC = () => {
 
   const [playMoveSound] = useSound('/sounds/move.mp3', { volume: 0.5 })
 
+  /**
+   * 새로운 테트리스 피스를 생성하는 함수
+   * @returns {Object} 새로운 테트리스 피스 객체 (모양, 색상, 위치 정보 포함)
+   */
   const createNewPiece = useCallback(() => {
     const tetrominos = Object.keys(TETROMINOS) as (keyof typeof TETROMINOS)[]
     const randTetromino = tetrominos[Math.floor(Math.random() * tetrominos.length)]
@@ -56,6 +60,12 @@ const Tetris: React.FC = () => {
     }
   }, [])
 
+  /**
+   * 피스와 보드의 충돌을 검사하는 함수
+   * @param {Object} piece - 검사할 테트리스 피스
+   * @param {Array} board - 현재 게임 보드 상태
+   * @returns {boolean} 충돌 여부
+   */
   const isCollision = useCallback((piece: typeof currentPiece, board: TetrisBoard) => {
     if (!piece) return false
     for (let y = 0; y < piece.shape.length; y++) {
@@ -75,6 +85,12 @@ const Tetris: React.FC = () => {
     return false
   }, [])
 
+  /**
+   * 피스를 게임 보드에 병합하는 함수
+   * @param {Object} piece - 병합할 테트리스 피스
+   * @param {Array} board - 현재 게임 보드
+   * @returns {Array} 병합된 새로운 게임 보드
+   */
   const mergePieceToBoard = useCallback((piece: typeof currentPiece, board: TetrisBoard) => {
     if (!piece) return board
     const newBoard = board.map(row => [...row])
@@ -88,6 +104,11 @@ const Tetris: React.FC = () => {
     return newBoard
   }, [])
 
+  /**
+   * 완성된 라인을 제거하고 점수를 업데이트하는 함수
+   * @param {Array} board - 현재 게임 보드
+   * @returns {Array} 라인이 제거된 새로운 게임 보드
+   */
   const clearLines = useCallback((board: TetrisBoard) => {
     let linesCleared: number[] = []
     const newBoard = board.filter((row, index) => {
@@ -102,6 +123,7 @@ const Tetris: React.FC = () => {
       newBoard.unshift(Array(BOARD_WIDTH).fill(null))
     }
     
+    // 점수 업데이트: 깨진 라인의 수 x 100
     const newScore = score + linesCleared.length * 100
     setScore(newScore)
     
@@ -114,6 +136,10 @@ const Tetris: React.FC = () => {
     return newBoard
   }, [score, level])
 
+  /**
+   * 피스를 아래로 이동시키는 함수
+   * 바닥에 닿으면 새로운 피스를 생성하고 게임 오버를 체크
+   */
   const moveDown = useCallback(() => {
     if (!currentPiece || gameOver) return
     const newPiece = { ...currentPiece, y: currentPiece.y + 1 }
@@ -150,6 +176,10 @@ const Tetris: React.FC = () => {
     }
   }, [currentPiece, nextPieces, board, isCollision, mergePieceToBoard, clearLines, createNewPiece, gameOver])
 
+  /**
+   * 피스를 좌우로 이동시키는 함수
+   * @param {number} direction - 이동 방향 (-1: 왼쪽, 1: 오른쪽)
+   */
   const moveHorizontally = useCallback((direction: number) => {
     if (!currentPiece || gameOver) return
     const newPiece = { ...currentPiece, x: currentPiece.x + direction }
@@ -159,6 +189,9 @@ const Tetris: React.FC = () => {
     }
   }, [currentPiece, board, isCollision, gameOver, playMoveSound])
 
+  /**
+   * 피스를 회전시키는 함수
+   */
   const rotate = useCallback(() => {
     if (!currentPiece || gameOver) return
     const rotatedShape = currentPiece.shape[0].map((_, index) =>
@@ -171,6 +204,9 @@ const Tetris: React.FC = () => {
     }
   }, [currentPiece, board, isCollision, gameOver, playMoveSound])
 
+  /**
+   * 피스를 즉시 바닥으로 떨어뜨리는 함수
+   */
   const dropPiece = useCallback(() => {
     if (!currentPiece || gameOver) return
     let newPiece = { ...currentPiece }
@@ -198,10 +234,17 @@ const Tetris: React.FC = () => {
     })
   }, [currentPiece, board, nextPieces, isCollision, mergePieceToBoard, clearLines, createNewPiece, gameOver])
 
+  /**
+   * 빈 게임 보드를 생성하는 함수
+   * @returns {Array} 초기화된 게임 보드
+   */
   const createEmptyBoard = (): TetrisBoard => {
     return Array(BOARD_HEIGHT).fill(null).map(() => Array(BOARD_WIDTH).fill(null))
   }
 
+  /**
+   * 게임을 초기 상태로 리셋하는 함수
+   */
   const resetGame = () => {
     setBoard(createEmptyBoard())
     setCurrentPiece(null)
@@ -213,6 +256,10 @@ const Tetris: React.FC = () => {
     // 게임 시작 로직을 여기에 추가
   }
 
+  /**
+   * 게임을 시작하는 함수
+   * 초기 피스와 다음 피스들을 설정
+   */
   const startGame = () => {
     setGameStarted(true)
     resetGame()
@@ -229,6 +276,9 @@ const Tetris: React.FC = () => {
     })
   }
 
+  /**
+   * 게임을 종료하고 메인 화면으로 이동하는 함수
+   */
   const exitGame = () => {
     window.location.href = '/' // 메인 화면의 경로로 설정
   }
@@ -328,6 +378,10 @@ const Tetris: React.FC = () => {
     };
   }, [gameStarted]);
 
+  /**
+   * 게임 보드를 렌더링하는 함수
+   * @returns {JSX.Element} 렌더링된 게임 보드
+   */
   const renderBoard = () => {
     if (!gameStarted) {
       return Array(BOARD_HEIGHT).fill(null).map((_, i) => (
@@ -374,6 +428,10 @@ const Tetris: React.FC = () => {
     ))
   }
 
+  /**
+   * 다음 피스 미리보기를 렌더링하는 함수
+   * @returns {JSX.Element[]} 렌더링된 미리보기 블록들
+   */
   const renderNextPieces = () => {
     // 게임이 시작되지 않았을 때 빈 미리보기 블록 생성
     if (!gameStarted) {
