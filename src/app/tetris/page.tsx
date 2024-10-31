@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import WarmAlert from '@/components/modal/WarmAlert'
 import useSound from 'use-sound'
 
+const purpleDogGradient = 'bg-gradient-to-r from-purple-600 to-indigo-600'
+
 const BOARD_WIDTH = 10
 const BOARD_HEIGHT = 20
 
@@ -414,7 +416,7 @@ export default function Tetris() {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
     }
-    const speed = Math.max(100, 1000 - (level - 1) * 100) // 최고 속도는 100ms
+    const speed = Math.max(100, 700 - (level - 1) * 100) // 속도조정
     intervalRef.current = setInterval(moveDown, speed)
     return () => {
       if (intervalRef.current) {
@@ -566,8 +568,8 @@ export default function Tetris() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-800">
-      <div className="flex flex-col md:flex-row items-start p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 flex-grow">
+    <div className={`flex flex-col h-screen items-center justify-center ${purpleDogGradient}`}>
+      <div className="flex flex-col md:flex-row items-start p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
         <div className="mb-6 md:mb-0 md:mr-6 lg:mr-8 xl:mr-12">
           <div className="text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-4 md:mb-6 text-white">
             Score: {score}
