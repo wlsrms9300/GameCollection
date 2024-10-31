@@ -18,13 +18,20 @@
     "use-sound": "^4.0.3"
   },
   "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@rushstack/eslint-config": "^4.0.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
+    "eslint": "^9.13.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "14.2.15",
+    "eslint-plugin-react": "^7.37.2",
+    "globals": "^15.11.0",
     "postcss": "^8.4.47",
+    "prettier": "^3.3.3",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "^8.12.2"
   }
 }

@@ -21,8 +21,10 @@ export default function SignUpPage() {
 
   const purpleDogGradient = 'bg-gradient-to-r from-purple-600 to-indigo-600'
   const purpleShadow = 'shadow-lg shadow-purple-500/50'
-  const purpleButton = 'bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full w-full transition duration-300 ease-in-out transform hover:scale-105'
-  const purpleInputStyle = 'w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-full focus:outline-none focus:border-purple-500'
+  const purpleButton =
+    'bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full w-full transition duration-300 ease-in-out transform hover:scale-105'
+  const purpleInputStyle =
+    'w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-full focus:outline-none focus:border-purple-500'
   const purpleLink = 'text-purple-600 hover:text-purple-800 text-sm'
 
   return (
@@ -30,17 +32,13 @@ export default function SignUpPage() {
       {/* 알림 모달 */}
       {showAlert && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <WarmAlert 
-            message={alertMessage} 
-            onClose={() => setShowAlert(false)} 
-            actionText="확인"
-          />
+          <WarmAlert message={alertMessage} onClose={() => setShowAlert(false)} actionText="확인" />
         </div>
       )}
-      
+
       <div className="w-full max-w-md">
-        <form 
-          onSubmit={handleSubmit} 
+        <form
+          onSubmit={handleSubmit}
           className={`mb-4 rounded-lg bg-white px-8 pb-8 pt-6 ${purpleShadow}`}
         >
           <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">회원가입</h2>
@@ -90,15 +88,14 @@ export default function SignUpPage() {
           </Text>
 
           <div className="flex flex-col items-center gap-4 mt-6">
-            <button
-              className={`${purpleButton} w-full`}
-              type="submit"
-            >
+            <button className={`${purpleButton} w-full`} type="submit">
               가입하기
             </button>
 
             <div className="flex justify-center items-center space-x-2 text-sm">
-              <Link href="/login" className={purpleLink}>로그인 페이지로 돌아가기</Link>
+              <Link href="/login" className={purpleLink}>
+                로그인 페이지로 돌아가기
+              </Link>
             </div>
           </div>
         </form>
