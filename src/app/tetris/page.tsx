@@ -84,7 +84,7 @@ export default function Tetris() {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const [playMoveSound] = useSound('/sounds/move.mp3', { volume: 0.5 })
+  const [playSound, { stop }] = useSound('/sounds/loginska.mp3', { volume: 0.5 })
 
   /**
    * 새로운 테트리스 피스를 생성하는 함수
@@ -194,8 +194,8 @@ export default function Tetris() {
       newBoard = clearLines(newBoard)
       setBoard(newBoard)
 
-      // 게임 오버 체크
       if (currentPiece.y <= 0) {
+        stop()
         setGameOver(true)
         setShowModal(true)
         setGameStarted(false)
@@ -241,10 +241,9 @@ export default function Tetris() {
       const newPiece = { ...currentPiece, x: currentPiece.x + direction }
       if (!isCollision(newPiece, board)) {
         setCurrentPiece(newPiece)
-        playMoveSound()
       }
     },
-    [currentPiece, board, isCollision, gameOver, playMoveSound],
+    [currentPiece, board, isCollision, gameOver],
   )
 
   /**
@@ -258,9 +257,8 @@ export default function Tetris() {
     const newPiece = { ...currentPiece, shape: rotatedShape }
     if (!isCollision(newPiece, board)) {
       setCurrentPiece(newPiece)
-      playMoveSound()
     }
-  }, [currentPiece, board, isCollision, gameOver, playMoveSound])
+  }, [currentPiece, board, isCollision, gameOver])
 
   /**
    * 피스를 즉시 바닥으로 떨어뜨리는 함수
@@ -330,6 +328,7 @@ export default function Tetris() {
    * 초기 피스와 다음 피스들을 설정
    */
   const startGame = () => {
+    playSound()
     setGameStarted(true)
     resetGame()
     const initialNextPieces = [createNewPiece(), createNewPiece(), createNewPiece()]
@@ -345,7 +344,8 @@ export default function Tetris() {
    * 게임을 종료하고 메인 화면으로 이동하는 함수
    */
   const exitGame = () => {
-    window.location.href = '/' // 메인 화면의 경로로 설정
+    stop()
+    window.location.href = '/'
   }
 
   useEffect(() => {
@@ -567,15 +567,21 @@ export default function Tetris() {
     })
   }
 
+  useEffect(() => {
+    return () => {
+      stop()
+    }
+  }, [stop])
+
   return (
     <div className={`flex flex-col h-screen items-center justify-center ${purpleDogGradient}`}>
       <div className="flex flex-col md:flex-row items-start p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
         <div className="mb-6 md:mb-0 md:mr-6 lg:mr-8 xl:mr-12">
           <div className="text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-4 md:mb-6 text-white">
-            Score: {score}
+            점수: {score}
           </div>
           <div className="text-lg sm:text-xl md:text-2xl mb-2 sm:mb-4 md:mb-6 text-white">
-            Level: {level}
+            난이도: {level}
           </div>
           <div className="border-4 border-gray-700 relative">
             {renderBoard()}

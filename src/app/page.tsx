@@ -10,7 +10,7 @@ export default function MainPage() {
 
   return (
     <div className={`flex min-h-screen items-center justify-center ${purpleDogGradient}`}>
-      <div className={`text-center ${purpleShadow} bg-white p-4 rounded-lg max-w-xs w-full mx-2`}>
+      <div className={`text-center ${purpleShadow} bg-white p-4 rounded-full max-w-xs w-full mx-2`}>
         <div className="space-y-2">
           <Link href="/tetris">
             <button className={`${purpleButton} w-full text-sm`}>게임시작</button>
