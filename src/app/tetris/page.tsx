@@ -84,7 +84,31 @@ export default function Tetris() {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const [playSound, { stop }] = useSound('/sounds/loginska.mp3', { volume: 0.5 })
+  const [playSoundA, { stop: stopSoundA }] = useSound('/sounds/loginska.mp3', { volume: 0.5 })
+  const [playSoundB, { stop: stopSoundB }] = useSound('/sounds/troika.mp3', { volume: 0.5 })
+  const [playSoundC, { stop: stopSoundC }] = useSound('/sounds/kalinka.mp3', { volume: 0.5 })
+
+  /**
+   * 세 개의 배경음악 중 무작위로 하나를 재생하는 함수
+   * - loginska.mp3
+   * - troika.mp3
+   * - kalinka.mp3
+   * 중 하나가 랜덤하게 선택되어 재생됨
+   */
+  const playRandomSound = useCallback(() => {
+    const sounds = [playSoundA, playSoundB, playSoundC]
+    const randomIndex = Math.floor(Math.random() * sounds.length)
+    sounds[randomIndex]()
+  }, [playSoundA, playSoundB, playSoundC])
+
+  /**
+   * 모든 배경음악을 멈추는 함수
+   */
+  const stopAllSounds = useCallback(() => {
+    stopSoundA()
+    stopSoundB()
+    stopSoundC()
+  }, [stopSoundA, stopSoundB, stopSoundC])
 
   /**
    * 새로운 테트리스 피스를 생성하는 함수
@@ -195,7 +219,7 @@ export default function Tetris() {
       setBoard(newBoard)
 
       if (currentPiece.y <= 0) {
-        stop()
+        stopAllSounds()
         setGameOver(true)
         setShowModal(true)
         setGameStarted(false)
@@ -328,7 +352,7 @@ export default function Tetris() {
    * 초기 피스와 다음 피스들을 설정
    */
   const startGame = () => {
-    playSound()
+    playRandomSound()
     setGameStarted(true)
     resetGame()
     const initialNextPieces = [createNewPiece(), createNewPiece(), createNewPiece()]
@@ -344,7 +368,7 @@ export default function Tetris() {
    * 게임을 종료하고 메인 화면으로 이동하는 함수
    */
   const exitGame = () => {
-    stop()
+    stopAllSounds()
     window.location.href = '/'
   }
 
@@ -566,12 +590,6 @@ export default function Tetris() {
       )
     })
   }
-
-  useEffect(() => {
-    return () => {
-      stop()
-    }
-  }, [stop])
 
   return (
     <div className={`flex flex-col h-screen items-center justify-center ${purpleDogGradient}`}>
