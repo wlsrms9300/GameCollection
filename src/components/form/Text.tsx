@@ -27,7 +27,7 @@ const TextLabel: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({
   ...props
 }) => {
   const context = useContext(TextContext)
-  if (!context) throw new Error('TextLabel must be used within a Text')
+  if (!context) throw new Error('TextLabel은 Text 컴포넌트 내에서 사용해야 합니다.')
 
   return (
     <label htmlFor={context.id} className="block text-sm font-medium text-gray-700 mb-1" {...props}>
@@ -38,7 +38,7 @@ const TextLabel: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({
 
 const TextInput: React.FC<Omit<InputHTMLAttributes<HTMLInputElement>, 'id'>> = (props) => {
   const context = useContext(TextContext)
-  if (!context) throw new Error('TextInput must be used within a Text')
+  if (!context) throw new Error('TextInput은 Text 컴포넌트 내에서 사용해야 합니다.')
 
   return (
     <input

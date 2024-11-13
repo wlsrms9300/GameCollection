@@ -93,8 +93,8 @@ export default function SignUpPage() {
             </button>
 
             <div className="flex justify-center items-center space-x-2 text-sm">
-              <Link href="/login" className={purpleLink}>
-                로그인 페이지로 돌아가기
+              <Link href="/signin" className={purpleLink}>
+                로그인 화면으로 돌아가기
               </Link>
             </div>
           </div>

@@ -449,7 +449,6 @@ export default function Tetris() {
     }
   }, [moveDown, level, gameStarted, gameOver])
 
-  // useEffect 추가
   useEffect(() => {
     const handleStartGameKeyPress = (event: KeyboardEvent) => {
       if (!gameStarted && event.key === 'Enter') {

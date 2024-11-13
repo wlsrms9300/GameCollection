@@ -82,6 +82,23 @@ export default function LoginPage() {
             </div>
           </div>
 
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <Link href="/" className="flex justify-center items-center text-gray-500 hover:text-gray-700 transition-colors">
+              <svg 
+                className="w-5 h-5 mr-2" 
+                fill="none" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path d="M15 19l-7-7 7-7" />
+              </svg>
+              메인 화면으로 돌아가기
+            </Link>
+          </div>
+
           {/* <div className="mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
