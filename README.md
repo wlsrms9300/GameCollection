@@ -24,6 +24,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
   3. 로그인, 회원가입 화면 추가 (디자인 완료)
   4. supabase연동 (완료)
   5. vercel 배포 (1차) - 게임만 진행되는 상태
+     - https://game-collection-jingeuns-projects.vercel.app/tetris
+     - vercel배포 시 화면 사이즈가 맞지 않다. 80%의 배율로 보면 정상이다. 수정이 필요해보인다.
 
 - 개발예정
 
