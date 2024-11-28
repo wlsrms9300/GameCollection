@@ -15,9 +15,9 @@ export default function MainPage() {
           <Link href="/tetris">
             <button className={`${purpleButton} w-full text-sm`}>게임시작</button>
           </Link>
-          <Link href="/signin">
+          {/* <Link href="/signin">
             <button className={`${purpleButton} w-full text-sm mt-2`}>로그인</button>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>
